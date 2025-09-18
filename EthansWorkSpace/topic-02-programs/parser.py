@@ -42,15 +42,29 @@ def test_parse_factor():
         assert ast=={'tag': 'number', 'value': int(s)}
         assert tokens[0]['tag'] == None 
     for s in ["(1)","(22)"]:
-        tokens = tokenize(s)
-        ast, tokens = parse_factor(tokens)
+        tokens1 = tokenize(s)
+        ast, tokens1 = parse_factor(tokens1)
         s_n = s.replace("(","").replace(")","")
         assert ast=={'tag': 'number', 'value': int(s_n)}
-        assert tokens[0]['tag'] == None 
+        assert tokens1[0]['tag'] == None 
     tokens = tokenize("(2+3)")
     ast, tokens = parse_factor(tokens)
     assert ast == {'tag': '+', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 3}}
-
+    tokens_test = tokenize("((3))")
+    ast, tokens_test = parse_factor(tokens_test)
+    assert ast == {'tag': 'number', 'value': 3}
+    assert tokens_test[0]['tag'] == None
+    tokens_test2 = tokenize("(1+2*3)")
+    ast, tokens_test2 = parse_factor(tokens_test2)
+    assert ast == {
+        'tag': '+',
+        'left': {'tag': 'number', 'value': 1},
+        'right': {
+            'tag': '*',
+            'left': {'tag': 'number', 'value': 2},
+            'right': {'tag': 'number', 'value': 3}
+        }
+    }
 def parse_term(tokens):
     """
     term = factor { "*"|"/" factor }
@@ -78,7 +92,21 @@ def test_parse_term():
     assert ast == {'tag': '*', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 4}}
     tokens = tokenize("2*4/6")
     ast, tokens = parse_term(tokens)
-    assert ast == {'tag': '/', 'left': {'tag': '*', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 4}}, 'right': {'tag': 'number', 'value': 6}}
+    assert ast == {
+        'tag': '/', 
+        'left': {'tag': '*', 'left': {'tag': 'number', 'value': 2}, 
+        'right': {'tag': 'number', 'value': 4}}, 'right': {'tag': 'number', 'value': 6}}
+    tokens_test = tokenize("2*(3+4)")
+    ast, tokens_test = parse_term(tokens_test)
+    assert ast == {
+        'tag': '*',
+        'left': {'tag': 'number', 'value': 2},
+        'right': {
+            'tag': '+',
+            'left': {'tag': 'number', 'value': 3},
+            'right': {'tag': 'number', 'value': 4}
+        }
+    }
 
 def parse_expression(tokens):
     """
