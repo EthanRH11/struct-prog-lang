@@ -137,7 +137,6 @@ def ast_to_string(ast):
 
 
 def get_position(node):
-    """Return the best available position for an AST node (or None)."""
     if not isinstance(node, dict):
         return None
     if "position" in node:
