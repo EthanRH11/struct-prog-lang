@@ -1,3 +1,0 @@
-#!/bin/bash
-python runner.py $1
-
